@@ -22,5 +22,5 @@ RUN chmod +x /*.sh
 
 RUN export http_proxy=$http_proxy; export https_proxy=$https_proxy; export no_proxy=$no_proxy; /setup.sh
 
-CMD /startup.sh
+ENTRYPOINT /startup.sh
 
