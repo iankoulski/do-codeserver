@@ -10,5 +10,7 @@ echo "Setup script executed"
 
 echo "alias ll='ls -alh --color=auto'" >> /root/.bashrc
 
+apt update
 
+apt upgrade -y
 
