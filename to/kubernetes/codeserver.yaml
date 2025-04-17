@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: do-codeserver
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: do-codeserver
+  namespace: do-codeserver
+  labels:
+    app: do-codeserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: do-codeserver
+  template:
+    metadata:
+      labels:
+        app: do-codeserver
+    spec:
+      #nodeSelector:
+      #  beta.kubernetes.io/instance-type: "c5.2xlarge"
+      containers:
+      - name: main
+        image: "iankoulski/do-codeserver:latest"
+        imagePullPolicy: Always
+        #command: [""]
+        #args: [""]
+        ports:
+        - name: pod-port
+          containerPort: 8080
+        env:
+        - name: PASSWORD
+          value: "C0d3S3rv3r"
+        #resources:
+        #  limits:
+        #    cpu: 4
+        #    memory: 4Gi
+        #    nvidia.com/gpu: 1
+        #    k8s.amazonaws.com/vgpu: 5
+        #  requests:
+        #    cpu: "1"
+        #    memory: 1Gi   
+        #volumeMounts:
+        #- name: nvidia-mps
+        #  mountPath: /tmp/nvidia-mps
+      #volumes:
+      #- name: nvidia-mps
+      #  hostPath:
+      #    path: /tmp/nvidia-mps
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: do-codeserver
+  namespace: do-codeserver
+  labels:
+    app: do-codeserver
+spec:
+  ports:
+  - name: svc-port
+    port: 8080
+    targetPort: pod-port 
+  type: ClusterIP
+  selector:
+    app: do-codeserver
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: do-codeserver
+  namespace: do-codeserver
+spec:
+  rules:
+  - host: "do-codeserver.domain.ext"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: do-codeserver
+            port:
+              number: 8080
